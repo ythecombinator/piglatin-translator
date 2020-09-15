@@ -14,12 +14,13 @@ import {
 
 import {stringToArray} from 'utils/string';
 
-import {clearWord, handleSound} from './translator.transformers';
+import {clearWord, handleCaseOf, handleSound} from './translator.transformers';
 
 const keywordRegex = /way$/;
 
 const applyTransformers = (original: string) => {
   // Some transformers might need to be curried to take the original string as a param
+  const handleCase = handleCaseOf(original);
 
   const result = cond([
     // We should not apply any transformation on empty strings.
@@ -29,7 +30,7 @@ const applyTransformers = (original: string) => {
     // This does not go to `.transformers` because it makes no changes to the data.
     [test(keywordRegex), identity],
     // All transformers should be composed here:
-    [defaultsTo, pipe(clearWord, handleSound)],
+    [defaultsTo, pipe(clearWord, handleSound, handleCase)],
   ])(original);
 
   return result;
