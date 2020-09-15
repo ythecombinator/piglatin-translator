@@ -14,6 +14,8 @@ import {
 
 import {stringToArray} from 'utils/string';
 
+import {clearWord, handleSound} from './translator.transformers';
+
 const keywordRegex = /way$/;
 
 const applyTransformers = (original: string) => {
@@ -27,7 +29,7 @@ const applyTransformers = (original: string) => {
     // This does not go to `.transformers` because it makes no changes to the data.
     [test(keywordRegex), identity],
     // All transformers should be composed here:
-    [defaultsTo, pipe(() => {})],
+    [defaultsTo, pipe(clearWord, handleSound)],
   ])(original);
 
   return result;
