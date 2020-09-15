@@ -1,21 +1,33 @@
 import {
   adjust,
+  always,
   both,
   complement,
+  cond,
+  converge,
   head,
   identity,
   ifElse,
+  insert,
   join,
   juxt,
   last,
+  lensIndex,
+  map,
+  over,
   pipe,
   reduce,
   replace,
+  reverse,
+  split,
+  T as defaultsTo,
   test,
   toLower,
+  toPairs,
   toUpper,
 } from 'ramda';
 
+import {reduceIndexed} from 'utils/function';
 import {globalPunctuationRegex, vowelsRegex} from 'utils/regex';
 import {isPunctuation, isUpperCase} from 'utils/string';
 
@@ -59,3 +71,40 @@ export const handleCaseOf = (original: string) => (parsed: string) => {
 
   return join("", reduce(lettersReducer, lettersParsed, indexesToCapitalize));
 };
+
+//  RULE: Punctuation must remain in the same relative place from the end of the word.
+
+type PunctuationIndexes = { [k: string]: number };
+
+const mapPunctuationIndexes = pipe<string[], string[], PunctuationIndexes>(
+  reverse,
+  reduceIndexed<string, PunctuationIndexes>((acc, char, idx) => {
+    return isPunctuation(char) ? { ...acc, [char]: idx } : acc;
+  }, {})
+);
+
+const applyPunctuations = (indexes: PunctuationIndexes, letters: string[]) =>
+  reduce(
+    (acc: string[], punctuation: [string, number]) => {
+      const char = punctuation[0];
+      const index = acc.length - punctuation[1];
+      return insert(index, char, acc);
+    },
+    letters,
+    toPairs(indexes)
+  );
+
+export const handlePunctuationOf = (original: string) =>
+  cond<string, string>([
+    [always(!isPunctuation(original)), identity],
+    [
+      defaultsTo,
+      pipe(
+        juxt<string[], string, string>([always(original), identity]),
+        map(split("")),
+        over(lensIndex(0), mapPunctuationIndexes),
+        converge(applyPunctuations, [head, last]),
+        join("")
+      ),
+    ],
+  ]);
