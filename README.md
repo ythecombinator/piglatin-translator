@@ -1,3 +1,24 @@
+<h1 align="center">
+	<img src="preview.png" alt="Pig Latin">
+	<br>
+	<br>
+</h1>
+
+<br>
+<br>
+
+<p align="center">
+	A web app that translates English text input into Pig Latin.
+<br>
+<br>
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fbe4ee70-99b8-4391-beaf-84ee0c6de94e/deploy-status)](https://app.netlify.com/sites/piglatin-translator/deploys)
+
+![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)
+
+</p>
+<br>
+
 ## Overview
 
 Pig Latin is a language game with the following rules:
